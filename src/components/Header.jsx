@@ -15,9 +15,6 @@ function Header() {
 
   const searchResultsRef = useRef();
 
-  const listButtonRef = useRef();
-  const listButtonIconRef = useRef();
-
   const toggleBodyOverflow = () => {
     dispatch(toggleAsideStatus());
     document.body.classList.toggle(`overflow-y-hidden`);
@@ -28,24 +25,24 @@ function Header() {
     setListStatus(false);
   };
 
-  useEffect(() => {
-    const fn = (e) => {
-      if (
-        listButtonRef.current &&
-        e.target != listButtonRef.current &&
-        e.target != listButtonRef.current.children[0] &&
-        e.target != listButtonRef.current.children[0].children[0] &&
-        listStatus
-      ) {
-        setListStatus(false);
-      }
-    };
-    document.addEventListener(`click`, fn);
+  // useEffect(() => {
+  //   const fn = (e) => {
+  //     if (
+  //       listButtonRef.current &&
+  //       e.target != listButtonRef.current &&
+  //       e.target != listButtonRef.current.children[0] &&
+  //       e.target != listButtonRef.current.children[0].children[0] &&
+  //       listStatus
+  //     ) {
+  //       setListStatus(false);
+  //     }
+  //   };
+  //   document.addEventListener(`click`, fn);
 
-    return () => {
-      document.removeEventListener(`click`, fn);
-    };
-  });
+  //   return () => {
+  //     document.removeEventListener(`click`, fn);
+  //   };
+  // });
 
   useEffect(() => {
     if (search !== "") {
@@ -121,13 +118,8 @@ function Header() {
         </div>
       </div>
       <div className="relative">
-        <button onClick={() => setListStatus(!listStatus)} ref={listButtonRef}>
-          <FontAwesomeIcon
-            icon={faHeart}
-            className="text-xl text-red-500"
-            ref={listButtonIconRef}
-            onClick={() => setListStatus(!listStatus)}
-          />
+        <button onClick={() => setListStatus(!listStatus)}>
+          <FontAwesomeIcon icon={faHeart} className="text-xl text-red-500" />
         </button>
         <FavoriteList status={listStatus} />
       </div>
