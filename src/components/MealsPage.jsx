@@ -9,9 +9,6 @@ function FirstLoadPage() {
   const pageContent = useRef();
   const aside = useSelector((state) => state.aside);
   const [currentMeals, setCurrentMeals] = useState([]);
-  const [correctTimes, setCorrectTimes] = useState(0);
-  const [times, setTimes] = useState(0);
-  const [repeated, setRepeated] = useState(0);
 
   const mealsData = useSelector((state) => state.mealsData);
   const dispatch = useDispatch();
@@ -30,36 +27,26 @@ function FirstLoadPage() {
 
   toggleMargin();
 
+  async function fetchData() {
+    let response = await fetch(
+      "https://www.themealdb.com/api/json/v1/1/random.php",
+    );
+    let data = await response.json();
+
+    if (currentMeals.length < 8) {
+      if (data.meals[0].strCategory !== "Pork") {
+        let allMeals = [...currentMeals, data.meals[0]];
+        setCurrentMeals(
+          [...new Set(allMeals.map(JSON.stringify))].map(JSON.parse),
+        );
+      }
+    }
+  }
+
   useEffect(() => {
-    const fetchData = () => {
-      let notRepeatedMeals = [];
-      fetch("https://www.themealdb.com/api/json/v1/1/random.php")
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.meals[0].strCategory !== "Pork") {
-            if (correctTimes < 8) {
-              notRepeatedMeals = currentMeals.filter((meal) => {
-                return meal.idMeal !== data.meals[0].idMeal;
-              });
-
-              setCurrentMeals([...notRepeatedMeals, data.meals[0]]);
-
-              if (!repeated) {
-                setCurrentMeals([...currentMeals, data.meals[0]]);
-                setCorrectTimes(correctTimes + 1);
-              }
-            }
-          }
-          if (correctTimes < 8) {
-            setTimes(times + 1);
-            setRepeated(0);
-          }
-        })
-        .catch((error) => console.log(error));
-    };
     fetchData();
     dispatch(fillNewData({ meals: currentMeals }));
-  }, [times]);
+  }, [currentMeals]);
 
   return (
     <>
@@ -67,7 +54,7 @@ function FirstLoadPage() {
         ref={pageContent}
         className="grid grid-cols-1 gap-8 pt-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
       >
-        {mealsData.meals && mealsData.meals.length === 8 ? (
+        {mealsData.meals && mealsData.meals.length >= 8 ? (
           mealsData.meals.map((meal) => {
             return (
               <Card
