@@ -11,12 +11,16 @@ function Aside() {
   const asideRef = useRef();
   const dispatch = useDispatch();
 
+  async function fetchCategories() {
+    let response = await fetch(
+      "https://www.themealdb.com/api/json/v1/1/categories.php",
+    );
+    let data = await response.json();
+    setCategories(data.categories);
+  }
+
   useEffect(() => {
-    fetch(`https://www.themealdb.com/api/json/v1/1/categories.php`)
-      .then((res) => res.json())
-      .then((data) => {
-        setCategories(data.categories);
-      });
+    fetchCategories();
   }, []);
 
   const togglingAside = () => {
