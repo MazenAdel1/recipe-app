@@ -25,39 +25,25 @@ function Header() {
     setListStatus(false);
   };
 
-  // useEffect(() => {
-  //   const fn = (e) => {
-  //     if (
-  //       listButtonRef.current &&
-  //       e.target != listButtonRef.current &&
-  //       e.target != listButtonRef.current.children[0] &&
-  //       e.target != listButtonRef.current.children[0].children[0] &&
-  //       listStatus
-  //     ) {
-  //       setListStatus(false);
-  //     }
-  //   };
-  //   document.addEventListener(`click`, fn);
+  async function fetchSearch() {
+    const response = await fetch(
+      `https://www.themealdb.com/api/json/v1/1/search.php?s=${search}`,
+    );
+    const data = await response.json();
 
-  //   return () => {
-  //     document.removeEventListener(`click`, fn);
-  //   };
-  // });
+    let filteredResults = [];
+
+    data.meals &&
+      (filteredResults = data.meals.filter((meal) => {
+        return meal.strCategory != "Pork";
+      }));
+
+    setSearchResults(filteredResults);
+  }
 
   useEffect(() => {
     if (search !== "") {
-      fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${search}`)
-        .then((res) => res.json())
-        .then((data) => {
-          let filteredResults = [];
-
-          data.meals &&
-            (filteredResults = data.meals.filter((meal) => {
-              return meal.strCategory != "Pork";
-            }));
-
-          setSearchResults(filteredResults);
-        });
+      fetchSearch();
 
       searchResultsRef.current.classList.remove(`hidden`);
     } else {
