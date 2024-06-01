@@ -2,7 +2,7 @@ import { useRef } from "react";
 import Header from "./Header";
 import { useSelector } from "react-redux";
 import { Route, Routes } from "react-router-dom";
-import MealsPage from "./MealsPage";
+import LandingPage from "./LandingPage";
 import CategoryPage from "./CategoryPage";
 import Meal from "./Meal";
 
@@ -27,7 +27,7 @@ function MainPage() {
       <div ref={mainPage} className="px-3 py-5 md:px-10 lg:px-20">
         <Header />
         <Routes>
-          <Route path="/" element={<MealsPage />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path=":categoryName" element={<CategoryPage />} />
           <Route path="meal/:mealId" element={<Meal />} />
         </Routes>
