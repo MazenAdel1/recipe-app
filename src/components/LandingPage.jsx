@@ -1,11 +1,10 @@
-import { faCircleNotch } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Card from "./Card";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fillNewData } from "../rtk/slices/meals-data-slice";
+import SkeletonCard from "./SkeletonCard";
 
-function FirstLoadPage() {
+function LandingPage() {
   const pageContent = useRef();
   const aside = useSelector((state) => state.aside);
   const [currentMeals, setCurrentMeals] = useState([]);
@@ -28,24 +27,23 @@ function FirstLoadPage() {
   toggleMargin();
 
   async function fetchData() {
-    let response = await fetch(
-      "https://www.themealdb.com/api/json/v1/1/random.php",
+    const response = await fetch(
+      `https://www.themealdb.com/api/json/v1/1/random.php`,
     );
-    let data = await response.json();
+    const data = await response.json();
 
-    if (currentMeals.length < 8) {
-      if (data.meals[0].strCategory !== "Pork") {
-        let allMeals = [...currentMeals, data.meals[0]];
-        setCurrentMeals(
-          [...new Set(allMeals.map(JSON.stringify))].map(JSON.parse),
-        );
+    if (data.meals[0].strCategory !== "Pork") {
+      if (!currentMeals.some((meal) => meal.idMeal === data.meals[0].idMeal)) {
+        setCurrentMeals((prev) => [...prev, data.meals[0]]);
       }
     }
   }
 
   useEffect(() => {
-    fetchData();
-    dispatch(fillNewData({ meals: currentMeals }));
+    if (currentMeals.length <= 8) {
+      fetchData();
+      dispatch(fillNewData({ meals: currentMeals }));
+    }
   }, [currentMeals]);
 
   return (
@@ -54,25 +52,20 @@ function FirstLoadPage() {
         ref={pageContent}
         className="grid grid-cols-1 gap-8 pt-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
       >
-        {mealsData.meals && mealsData.meals.length >= 8 ? (
-          mealsData.meals.map((meal) => {
-            return (
-              <Card
-                meal={meal}
-                mealCategory={meal.strCategory}
-                key={meal.idMeal}
-              />
-            );
-          })
-        ) : (
-          <FontAwesomeIcon
-            icon={faCircleNotch}
-            className="absolute left-1/2 top-1/2 animate-spin text-3xl text-white"
-          />
-        )}
+        {mealsData.meals && mealsData.meals.length >= 8
+          ? mealsData.meals.map((meal) => {
+              return (
+                <Card
+                  meal={meal}
+                  mealCategory={meal.strCategory}
+                  key={meal.idMeal}
+                />
+              );
+            })
+          : [...Array(8)].map((_, index) => <SkeletonCard key={index} />)}
       </div>
     </>
   );
 }
 
-export default FirstLoadPage;
+export default LandingPage;
